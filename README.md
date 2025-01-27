@@ -1,107 +1,109 @@
-### README: Resolución Automática de Captchas y Extracción de Datos de una Tabla en la Web
-#### Universidad Politécnica Salesiana - UPS
+### README: Resolución Automática de Captchas y Extracción de Datos
 
-#### Asignatura : Mineria de Datos
-#### Autor :Paul Astudillo
-#### Perdido :65
+#### Universidad Politécnica Salesiana (UPS)  
+#### Asignatura: Minería de Datos  
+#### Autor: Paul Astudillo  
+#### Período: 65  
 
-Este proyecto utiliza **Selenium** y **Tesseract OCR** para automatizar el llenado de un formulario web, resolver un captcha alfanumérico y extraer información de una tabla resultante. El flujo está diseñado para trabajar con la página de consulta de títulos de **SENESCYT**.
+Este proyecto automatiza el ingreso de cédulas, la resolución de captchas y la extracción de información de la tabla de resultados en la página de consulta de títulos de la **SENESCYT**. Utiliza **Selenium** y **Tesseract OCR** para realizar estas tareas de forma eficiente.
 
 ---
 
 ### Requisitos
 
 1. **Python 3.x** instalado.
-2. Las siguientes bibliotecas de Python:
+2. Librerías necesarias:
    - `selenium`
    - `pytesseract`
    - `Pillow`
 3. **Tesseract OCR** instalado:
-   - Descarga: [Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
-   - Configura la ruta en el código (`pytesseract.pytesseract.tesseract_cmd`).
+   - Descárgalo desde [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) y asegúrate de configurar la ruta en el código.
 4. **ChromeDriver** correspondiente a la versión de Google Chrome instalada:
-   - Descarga: [ChromeDriver](https://chromedriver.chromium.org/downloads).
-5. Acceso a la página web de **SENESCYT**:  
+   - Descarga desde [ChromeDriver](https://chromedriver.chromium.org/downloads) y actualiza la ruta en el script.
+5. **Acceso a la página de SENESCYT:**
    - URL: `https://www.senescyt.gob.ec/consulta-titulos-web/faces/vista/consulta/consulta.xhtml`
+6. Un archivo `cedula.txt` que contenga una cédula válida de 10 dígitos.
 
 ---
 
-### Archivos y Directorios
+### Archivos y Estructura del Proyecto
 
-- `main.py`: Contiene el script principal.
-- Carpeta `captchas_reales`: Contendrá las imágenes del captcha capturadas y procesadas para su análisis.
+- **`project.py`**: Script principal del proyecto.
+- **`cedula.txt`**: Archivo de texto con el número de cédula a consultar.
+- **`captchas_reales/`**: Carpeta que almacena las imágenes de los captchas descargados y procesados.
+- **`resultados/`**: Carpeta donde se guarda  capturas del proceso de ejecucion de los captchas resueltos y los datos extraídos.
 
 ---
 
-### Cómo funciona el script
+### Pasos del Script
 
 #### 1. **Configuración inicial**
-- Se configura la ruta de Tesseract OCR y ChromeDriver.
-- Se crean directorios necesarios para guardar las imágenes del captcha.
+- Configura la ruta de **Tesseract OCR** y **ChromeDriver**.
+- Crea directorios para guardar captchas y resultados.
 
-#### 2. **Automatización con Selenium**
-- El script abre la página de consulta de títulos en **SENESCYT**.
-- Llena automáticamente el campo de **cédula** con el valor especificado (`0107235764`).
+#### 2. **Ingreso de datos**
+- Lee la cédula desde `cedula.txt` y verifica que sea válida.
+- Abre la página de SENESCYT y llena automáticamente el campo de cédula.
 
-#### 3. **Captura y resolución del captcha**
-- Captura la imagen del captcha y la guarda en la carpeta `captchas_reales`.
-- Preprocesa la imagen usando la biblioteca **Pillow**:
+#### 3. **Resolución del captcha**
+- Captura la imagen del captcha y la procesa:
   - Escala de grises.
-  - Mejora del contraste.
-  - Filtro de reducción de ruido.
-  - Binarización ajustada.
-- Usa **Tesseract OCR** para predecir el texto del captcha, limitando a 4 caracteres alfanuméricos.
+  - Mejora de contraste.
+  - Filtro de mediana para reducir ruido.
+  - Binarización para resaltar caracteres.
+- Predice el texto del captcha con **Tesseract OCR**.
 
 #### 4. **Validación y reintentos**
-- Si el texto predicho tiene 4 caracteres, lo ingresa en el campo del captcha.
-- Si no se resuelve correctamente, reintenta hasta un máximo de 5 veces.
+- Si el captcha no se resuelve correctamente, realiza hasta 5 intentos.
+- Si se resuelve correctamente, envía el formulario.
 
-#### 5. **Búsqueda y extracción de datos**
-- Una vez resuelto el captcha, el script hace clic en el botón **Buscar**.
-- Extrae las filas y columnas de la tabla de resultados y las imprime en la terminal.
+#### 5. **Extracción de datos**
+- Una vez resuelto el captcha, espera a que la tabla de resultados cargue.
+- Extrae y muestra las filas y columnas de la tabla.
 
-#### 6. **Cierre del navegador**
-- Finalmente, cierra el navegador de forma segura.
+#### 6. **Registro de resultados**
+- Guarda las imágenes procesadas del captcha en `captchas_reales/`.
+- Los resultados extraídos de la tabla se registran en consola.
+
+#### 7. **Cierre del navegador**
+- El navegador se cierra automáticamente al finalizar.
 
 ---
 
-### Instrucciones para usar el script
+### Cómo ejecutar el script
 
-1. Clona este repositorio o copia el archivo `main.py` en tu máquina local.
-2. Configura la ruta de Tesseract OCR en la línea:
+1. Coloca la cédula en el archivo `cedula.txt` (solo 10 dígitos, por ejemplo: `0107235764`).
+2. Asegúrate de que las rutas de **Tesseract OCR** y **ChromeDriver** estén configuradas correctamente en el script:
    ```python
    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-   ```
-3. Configura la ruta de ChromeDriver en la línea:
-   ```python
    CHROMEDRIVER_PATH = r"C:\\Users\\Paul\\chromedriver-win64\\chromedriver.exe"
    ```
-4. Instala las bibliotecas necesarias ejecutando:
+3. Instala las librerías necesarias ejecutando:
    ```bash
    pip install selenium pillow pytesseract
    ```
-5. Ejecuta el script:
+4. Ejecuta el script con:
    ```bash
-   python main.py
+   python project.py
    ```
 
 ---
 
 ### Resultado esperado
 
-1. **Captura y resolución del captcha**:
-   - Se capturan imágenes del captcha y se guardan en la carpeta `captchas_reales` para revisión.
-   - La predicción del captcha se valida y se ingresa en el formulario.
+1. **Resolución del captcha:**
+   - Se capturan imágenes del captcha en la carpeta `captchas_reales/`.
+   - Las predicciones del captcha se registran y verifican.
 
-2. **Extracción de datos**:
-   - La tabla de resultados se extrae y se muestra en la terminal. Por ejemplo:
+2. **Extracción de datos:**
+   - Se imprime en consola el contenido de la tabla de resultados. Ejemplo:
      ```plaintext
      Información encontrada en la tabla:
      ['INGENIERO/A BIOMEDICO/A', 'UNIVERSIDAD POLITÉCNICA SALESIANA', 'Nacional', '', '1034-2023-2761003', '2023-10-26', 'CIENCIAS NATURALES, MATEMÁTICAS Y ESTADÍSTICA', '']
      ```
 
-3. **Errores manejados**:
-   - Si el captcha no se resuelve después de 5 intentos, el script muestra un mensaje de error:
+3. **Errores manejados:**
+   - Si no se resuelve el captcha después de 5 intentos, muestra:
      ```plaintext
      No se pudo resolver el captcha después de varios intentos.
      ```
@@ -110,38 +112,31 @@ Este proyecto utiliza **Selenium** y **Tesseract OCR** para automatizar el llena
 
 ### Detalles técnicos
 
-1. **Preprocesamiento del captcha**:
-   - Escala de grises: Mejora la claridad al eliminar colores.
-   - Contraste: Resalta caracteres frente al fondo.
-   - Filtro de mediana: Reduce el ruido en la imagen.
-   - Binarización: Convierte píxeles claros/oscuros en blanco y negro.
+1. **Preprocesamiento de imágenes:**  
+   Mejora la calidad de los captchas mediante técnicas de procesamiento de imágenes:
+   - Escala de grises: Elimina distracciones de color.
+   - Contraste: Resalta los caracteres.
+   - Filtro de mediana: Reduce el ruido.
+   - Binarización: Convierte la imagen a blanco y negro para facilitar el reconocimiento.
 
-2. **Tesseract OCR**:
-   - Configuración específica para captchas de 4 caracteres:
-     ```plaintext
-     --psm 8 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-     ```
+2. **OCR con Tesseract:**  
+   Configuración optimizada para captchas de 4 caracteres:
+   ```plaintext
+   --psm 8 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+   ```
 
-3. **Selenium**:
-   - Encuentra elementos de la página mediante **XPath** y los interactúa automáticamente:
-     - Campo de cédula: `//input[@id="formPrincipal:identificacion"]`
-     - Imagen del captcha: `//img[@id="formPrincipal:capimg"]`
-     - Campo del captcha: `//input[@id="formPrincipal:captchaSellerInput"]`
-     - Botón Buscar: `//button[@id="formPrincipal:boton-buscar"]`
-   - Maneja tiempos de espera con `time.sleep` para garantizar que la página cargue completamente antes de interactuar con los elementos.
+3. **Automatización con Selenium:**  
+   - Interactúa con elementos de la página mediante XPath.
+   - Espera explícitas (`WebDriverWait`) aseguran que los elementos estén cargados antes de interactuar con ellos.
 
 ---
 
-### Notas importantes
+### Notas adicionales
 
-- **Revisión manual del captcha**:
-  - Si el OCR no funciona correctamente, verifica las imágenes en `captchas_reales` y ajusta los parámetros de preprocesamiento (`ImageOps.autocontrast`, `ImageFilter.MedianFilter`, etc.).
+- **Precisión del OCR:**  
+  Actualmente, el script tiene una precisión aproximada del 75%. Esto significa que podría fallar en algunos casos. Las imágenes de captchas fallidos se guardan para su análisis.
 
-- **XPath dinámicos**:
-  - Si la página cambia, puede ser necesario actualizar los identificadores XPath.
-
-- **Mejoras futuras**:
-  - Implementar un modelo de aprendizaje automático para resolver captchas de manera más precisa.
-  - Usar técnicas de espera explícita en Selenium (`WebDriverWait`) para mejorar la robustez.
+- **Universidad Politécnica Salesiana:**  
+  Este proyecto fue desarrollado para la asignatura de  **Minería de Datos** en el período **65**.
 
 ---
