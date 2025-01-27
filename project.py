@@ -48,7 +48,7 @@ def predict_with_tesseract(image_path):
 # Configuración de Selenium
 chrome_service = Service(CHROMEDRIVER_PATH)
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless")  # Ejecutar en modo sin cabeza
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 
@@ -74,6 +74,7 @@ for attempt in range(MAX_ATTEMPTS):
         captcha_path = os.path.join(CAPTCHA_SAVE_DIR, f"captcha_attempt_{attempt}.png")
         captcha_element.screenshot(captcha_path)
 
+        # Resolver el captcha
         predicted_text = predict_with_tesseract(captcha_path)
         print(f"Intento {attempt + 1}: Predicción del captcha = {predicted_text}")
 
@@ -90,9 +91,9 @@ for attempt in range(MAX_ATTEMPTS):
         submit_button = driver.find_element(By.XPATH, '//button[@id="formPrincipal:boton-buscar"]')
         submit_button.click()
 
-        # Esperar a que la tabla esté presente después de la recarga
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//div[@id="formPrincipal:j_idt52:0:tablaAplicaciones"]'))
+        # Esperar dinámicamente hasta que la tabla esté presente y visible
+        WebDriverWait(driver, 30).until(
+            EC.visibility_of_element_located((By.XPATH, '//div[@id="formPrincipal:j_idt63:0:tablaAplicaciones"]'))
         )
         print("Captcha resuelto correctamente y la tabla está disponible.")
         captcha_resuelto = True
@@ -107,17 +108,19 @@ if not captcha_resuelto:
 
 # Extraer la información de la tabla
 try:
-    table = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//div[@id="formPrincipal:j_idt52:0:tablaAplicaciones"]'))
+    table = WebDriverWait(driver, 30).until(
+        EC.visibility_of_element_located((By.XPATH, '//div[@id="formPrincipal:j_idt63:0:tablaAplicaciones"]'))
     )
-    rows = table.find_elements(By.XPATH, ".//tbody/tr")
-    print("Información encontrada en la tabla:")
+    print("Tabla encontrada, extrayendo datos...")
 
+    # Extraer las filas de la tabla
+    rows = table.find_elements(By.XPATH, ".//tbody/tr")
     for row in rows:
         cells = row.find_elements(By.TAG_NAME, "td")
         data = [cell.text.strip() for cell in cells]
         print(data)
 except Exception as e:
-    print(f"Error al extraer datos de la tabla: {e}")
+    print(f"Error al esperar o extraer la tabla: {e}")
+    driver.save_screenshot("tabla_error.png")  # Guarda una captura para analizar el estado de la página
 
 driver.quit()
